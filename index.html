@@ -87,7 +87,12 @@
 
     <!-- 商品銷售總表 -->
     <div id="summary-section" class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
-        <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">商品銷售總表</h2>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800">商品銷售總表</h2>
+            <button id="export-excel-btn" class="bg-teal-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-600 transition-all">
+                匯出 Excel
+            </button>
+        </div>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border border-gray-200" id="sales-summary-table">
                 <thead class="bg-gray-50">
@@ -149,6 +154,7 @@
             const totalPriceEl = document.getElementById('total-price');
             const orderLogBody = document.getElementById('order-log-body');
             const clearLogBtn = document.getElementById('clear-log-btn');
+            const exportExcelBtn = document.getElementById('export-excel-btn');
             const quantityChartCtx = document.getElementById('quantityChart').getContext('2d');
             const revenueChartCtx = document.getElementById('revenueChart').getContext('2d');
             const salesSummaryBody = document.getElementById('sales-summary-body');
@@ -331,10 +337,6 @@
                     }
                 });
 
-                // if (itemSummary.length > 0) {
-                //     exportSalesSummaryToExcel();
-                // }
-
                 const timestamp = new Date().toLocaleString('zh-TW', { hour12: false });
                 const itemDetailsHTML = itemSummary.join('<br>');
 
@@ -350,6 +352,9 @@
                 orderLogBody.insertAdjacentHTML('afterbegin', newRowHTML);
                 orderCounter++;
 
+                // 更新完數據後，儲存到 localStorage
+                saveDataToLocalStorage();
+
                 renderCharts();
                 renderSalesSummaryTable();
 
@@ -358,6 +363,41 @@
                     quantityEl.textContent = '0';
                 });
                 updateTotal();
+            }
+
+            // --- LocalStorage 相關函式 ---
+            function saveDataToLocalStorage() {
+                localStorage.setItem('posSalesData', JSON.stringify(salesData));
+                localStorage.setItem('posOrderCounter', orderCounter.toString());
+                localStorage.setItem('posOrderLogHTML', orderLogBody.innerHTML);
+            }
+
+            function loadDataFromLocalStorage() {
+                const savedSalesData = localStorage.getItem('posSalesData');
+                const savedOrderCounter = localStorage.getItem('posOrderCounter');
+                const savedOrderLogHTML = localStorage.getItem('posOrderLogHTML');
+
+                if (savedSalesData) {
+                    salesData = JSON.parse(savedSalesData);
+                    orderCounter = parseInt(savedOrderCounter, 10);
+                    orderLogBody.innerHTML = savedOrderLogHTML;
+                } else {
+                    initializeSalesData();
+                }
+            }
+
+            function clearAllData() {
+                // 清除 localStorage
+                localStorage.removeItem('posSalesData');
+                localStorage.removeItem('posOrderCounter');
+                localStorage.removeItem('posOrderLogHTML');
+
+                // 重設 UI 和變數
+                orderLogBody.innerHTML = '';
+                orderCounter = 1;
+                initializeSalesData();
+                renderCharts();
+                renderSalesSummaryTable();
             }
             
             function setupEventListeners() {
@@ -396,18 +436,20 @@
                 });
 
                 clearLogBtn.addEventListener('click', () => {
-                    orderLogBody.innerHTML = '';
-                    orderCounter = 1;
-                    initializeSalesData();
-                    renderCharts();
-                    renderSalesSummaryTable();
+                    clearAllData();
                     clearLogBtn.classList.add('btn-press');
                     setTimeout(() => clearLogBtn.classList.remove('btn-press'), 100);
+                });
+
+                exportExcelBtn.addEventListener('click', () => {
+                    exportSalesSummaryToExcel();
+                    exportExcelBtn.classList.add('btn-press');
+                    setTimeout(() => exportExcelBtn.classList.remove('btn-press'), 100);
                 });
             }
 
             // --- 初始化 ---
-            initializeSalesData();
+            loadDataFromLocalStorage(); // 載入儲存的資料
             renderMenuItems();
             updateTotal();
             renderCharts();
