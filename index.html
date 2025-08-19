@@ -6,9 +6,14 @@
     <title>點餐計價系統</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Chart.js 圖表庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* 使用 Google 字體 Inter 和 Noto Sans TC */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        html {
+            scroll-behavior: smooth; /* 讓頁面滾動更平滑 */
+        }
         body {
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
         }
@@ -30,10 +35,10 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-2 sm:p-4">
+<body class="bg-gray-100 p-2 sm:p-4">
 
     <!-- 主容器 -->
-    <div class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6">
+    <div class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
         
         <!-- 主內容區塊 -->
         <div class="w-full pt-6">
@@ -52,36 +57,181 @@
             </div>
         </div>
     </div>
+
+    <!-- 訂單記錄區塊 -->
+    <div id="order-log-section" class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800">訂單記錄</h2>
+            <button id="clear-log-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-600 transition-all">
+                全部清除
+            </button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">訂單編號</th>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">品項</th>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">總金額</th>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">時間</th>
+                    </tr>
+                </thead>
+                <tbody id="order-log-body">
+                    <!-- 訂單記錄將會被插入到這裡 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 商品銷售總表 -->
+    <div id="summary-section" class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">商品銷售總表</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200" id="sales-summary-table">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">商品</th>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">總數量</th>
+                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">總金額 (NT$)</th>
+                    </tr>
+                </thead>
+                <tbody id="sales-summary-body">
+                    <!-- 銷售總結將會被插入到這裡 -->
+                </tbody>
+                <tfoot id="sales-summary-footer">
+                    <!-- 當日總金額將會被插入到這裡 -->
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- 統計圖表區塊 -->
+    <div id="charts-section" class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6">
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">銷售統計圖表</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+                <h3 class="text-lg font-semibold text-center text-gray-700 mb-2">商品銷售數量</h3>
+                <canvas id="quantityChart"></canvas>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-center text-gray-700 mb-2">商品銷售金額 (NT$)</h3>
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             
             // --- 資料定義 ---
             const menuItems = [
-                { id: 1, name: '冰紅茶', price: 25, emoji: '🥤' },
-                { id: 9, name: '冰沙', price: 50, emoji: '🍧' },
-                { id: 10, name: '竹炭水', price: 20, emoji: '💧' },
-                { id: 11, name: '舒跑', price: 30, emoji: '🥤' },
-                { id: 8, name: '炸物', price: 30, emoji: '🍟' },
                 { id: 2, name: '蛋絲、火腿涼麵', price: 70, emoji: '🍜' },
                 { id: 3, name: '燻雞涼麵', price: 80, emoji: '🍜' },
                 { id: 4, name: '松坂肉涼麵', price: 90, emoji: '🍜' },
                 { id: 5, name: '燒肉刈包', price: 85, emoji: '🍔' },
                 { id: 6, name: '鴨賞刈包', price: 95, emoji: '🍔' },
-                { id: 7, name: '加蛋', price: 15, emoji: '🥚' }
+                { id: 7, name: '加蛋', price: 15, emoji: '🥚' },
+                { id: 1, name: '冰紅茶', price: 25, emoji: '🥤' },
+                { id: 9, name: '冰沙', price: 50, emoji: '🍧' },
+                { id: 10, name: '竹炭水', price: 20, emoji: '💧' },
+                { id: 11, name: '舒跑', price: 30, emoji: '🥤' },
+                { id: 8, name: '炸物', price: 30, emoji: '🍟' }
             ];
+            let orderCounter = 1;
+            let salesData = {};
+            let quantityChartInstance = null;
+            let revenueChartInstance = null;
 
             // --- 元素選取 ---
             const itemsContainer = document.getElementById('items-container');
             const totalPriceEl = document.getElementById('total-price');
+            const orderLogBody = document.getElementById('order-log-body');
+            const clearLogBtn = document.getElementById('clear-log-btn');
+            const quantityChartCtx = document.getElementById('quantityChart').getContext('2d');
+            const revenueChartCtx = document.getElementById('revenueChart').getContext('2d');
+            const salesSummaryBody = document.getElementById('sales-summary-body');
+            const salesSummaryFooter = document.getElementById('sales-summary-footer');
 
             // --- 函式定義 ---
+
+            function initializeSalesData() {
+                salesData = {};
+                menuItems.forEach(item => {
+                    salesData[item.name] = { quantity: 0, revenue: 0 };
+                });
+            }
+
+            function renderCharts() {
+                const labels = Object.keys(salesData);
+                const quantityData = labels.map(label => salesData[label].quantity);
+                const revenueData = labels.map(label => salesData[label].revenue);
+
+                if (quantityChartInstance) {
+                    quantityChartInstance.destroy();
+                }
+                quantityChartInstance = new Chart(quantityChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '銷售數量',
+                            data: quantityData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                });
+
+                if (revenueChartInstance) {
+                    revenueChartInstance.destroy();
+                }
+                revenueChartInstance = new Chart(revenueChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '銷售金額 (NT$)',
+                            data: revenueData,
+                            backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { scales: { y: { beginAtZero: true } } }
+                });
+            }
+
+            function renderSalesSummaryTable() {
+                salesSummaryBody.innerHTML = '';
+                let totalDailyRevenue = 0;
+
+                menuItems.forEach(item => {
+                    const itemName = item.name;
+                    const data = salesData[itemName];
+                    totalDailyRevenue += data.revenue;
+                    const rowHTML = `
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-4 border-b">${itemName}</td>
+                            <td class="py-2 px-4 border-b">${data.quantity}</td>
+                            <td class="py-2 px-4 border-b">${data.revenue}</td>
+                        </tr>
+                    `;
+                    salesSummaryBody.insertAdjacentHTML('beforeend', rowHTML);
+                });
+
+                // 更新當日總金額
+                salesSummaryFooter.innerHTML = `
+                    <tr class="bg-gray-100 font-bold">
+                        <td class="py-3 px-4" colspan="2">當日總金額</td>
+                        <td class="py-3 px-4">${totalDailyRevenue}</td>
+                    </tr>
+                `;
+            }
             
-            /**
-             * 根據 menuItems 陣列動態生成菜單和控制項 HTML
-             */
             function renderMenuItems() {
-                itemsContainer.innerHTML = ''; // 清空現有內容
+                itemsContainer.innerHTML = '';
                 
                 menuItems.forEach(itemData => {
                     const itemHTML = `
@@ -101,9 +251,9 @@
                 });
 
                 const resetBtnHTML = `
-                    <div id="reset-btn" class="flex flex-col items-center justify-center bg-gray-700 p-2 rounded-lg transition-all duration-200 h-28 cursor-pointer shadow-md hover:bg-gray-800 text-white">
-                        <span class="text-3xl">🔄</span>
-                        <p class="text-lg font-semibold mt-1 leading-tight">全部重設</p>
+                    <div id="reset-btn" class="flex flex-col items-center justify-center bg-green-500 p-2 rounded-lg transition-all duration-200 h-28 cursor-pointer shadow-md hover:bg-green-600 text-white">
+                        <span class="text-3xl">🛒</span>
+                        <p class="text-lg font-semibold mt-1 leading-tight">送出訂單</p>
                     </div>
                 `;
                 itemsContainer.insertAdjacentHTML('beforeend', resetBtnHTML);
@@ -129,6 +279,53 @@
                 });
                 
                 totalPriceEl.textContent = 'NT$ ' + currentTotal;
+                return currentTotal;
+            }
+
+            function logOrder() {
+                const currentTotal = updateTotal();
+                if (currentTotal === 0) {
+                    return;
+                }
+
+                const items = document.querySelectorAll('.item');
+                let itemSummary = [];
+
+                items.forEach(item => {
+                    const quantity = parseInt(item.querySelector('.quantity').textContent);
+                    if (quantity > 0) {
+                        const name = item.dataset.name;
+                        const price = parseInt(item.dataset.price);
+                        itemSummary.push(`${name} x ${quantity}`);
+                        
+                        salesData[name].quantity += quantity;
+                        salesData[name].revenue += quantity * price;
+                    }
+                });
+
+                const timestamp = new Date().toLocaleString('zh-TW', { hour12: false });
+                const itemDetailsHTML = itemSummary.join('<br>');
+
+                const newRowHTML = `
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-2 px-4 border-b">${orderCounter}</td>
+                        <td class="py-2 px-4 border-b">${itemDetailsHTML}</td>
+                        <td class="py-2 px-4 border-b">NT$ ${currentTotal}</td>
+                        <td class="py-2 px-4 border-b text-sm text-gray-500">${timestamp}</td>
+                    </tr>
+                `;
+
+                orderLogBody.insertAdjacentHTML('beforeend', newRowHTML);
+                orderCounter++;
+
+                renderCharts();
+                renderSalesSummaryTable();
+
+                const allQuantities = document.querySelectorAll('.quantity');
+                allQuantities.forEach(quantityEl => {
+                    quantityEl.textContent = '0';
+                });
+                updateTotal();
             }
             
             function setupEventListeners() {
@@ -138,11 +335,7 @@
                     const resetButton = e.target.closest('#reset-btn');
 
                     if (resetButton) {
-                        const allQuantities = document.querySelectorAll('.quantity');
-                        allQuantities.forEach(quantityEl => {
-                            quantityEl.textContent = '0';
-                        });
-                        updateTotal();
+                        logOrder();
                         resetButton.classList.add('btn-press');
                         setTimeout(() => resetButton.classList.remove('btn-press'), 100);
                         return;
@@ -169,11 +362,24 @@
                     quantityEl.textContent = quantity;
                     updateTotal();
                 });
+
+                clearLogBtn.addEventListener('click', () => {
+                    orderLogBody.innerHTML = '';
+                    orderCounter = 1;
+                    initializeSalesData();
+                    renderCharts();
+                    renderSalesSummaryTable();
+                    clearLogBtn.classList.add('btn-press');
+                    setTimeout(() => clearLogBtn.classList.remove('btn-press'), 100);
+                });
             }
 
             // --- 初始化 ---
+            initializeSalesData();
             renderMenuItems();
             updateTotal();
+            renderCharts();
+            renderSalesSummaryTable();
             setupEventListeners(); 
         });
     </script>
