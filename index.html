@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Chart.js 圖表庫 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 引入 SheetJS (xlsx) 用於匯出 Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <style>
         /* 使用 Google 字體 Inter 和 Noto Sans TC */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
@@ -162,7 +164,7 @@
             }
 
             function renderCharts() {
-                const labels = Object.keys(salesData);
+                const labels = menuItems.map(item => item.name);
                 const quantityData = labels.map(label => salesData[label].quantity);
                 const revenueData = labels.map(label => salesData[label].revenue);
 
@@ -221,7 +223,6 @@
                     salesSummaryBody.insertAdjacentHTML('beforeend', rowHTML);
                 });
 
-                // 更新當日總金額
                 salesSummaryFooter.innerHTML = `
                     <tr class="bg-gray-100 font-bold">
                         <td class="py-3 px-4" colspan="2">當日總金額</td>
@@ -281,6 +282,33 @@
                 totalPriceEl.textContent = 'NT$ ' + currentTotal;
                 return currentTotal;
             }
+            
+            function exportSalesSummaryToExcel() {
+                let totalDailyRevenue = 0;
+                const excelData = [
+                    ['商品', '總數量', '總金額 (NT$)']
+                ];
+
+                menuItems.forEach(item => {
+                    const itemName = item.name;
+                    const data = salesData[itemName];
+                    totalDailyRevenue += data.revenue;
+                    excelData.push([itemName, data.quantity, data.revenue]);
+                });
+
+                excelData.push([]);
+                excelData.push(['當日總金額', '', totalDailyRevenue]);
+
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, '銷售總表');
+
+                const today = new Date();
+                const dateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                const filename = `銷售總表_${dateString}.xlsx`;
+
+                XLSX.writeFile(wb, filename);
+            }
 
             function logOrder() {
                 const currentTotal = updateTotal();
@@ -303,6 +331,10 @@
                     }
                 });
 
+                // if (itemSummary.length > 0) {
+                //     exportSalesSummaryToExcel();
+                // }
+
                 const timestamp = new Date().toLocaleString('zh-TW', { hour12: false });
                 const itemDetailsHTML = itemSummary.join('<br>');
 
@@ -315,7 +347,7 @@
                     </tr>
                 `;
 
-                orderLogBody.insertAdjacentHTML('beforeend', newRowHTML);
+                orderLogBody.insertAdjacentHTML('afterbegin', newRowHTML);
                 orderCounter++;
 
                 renderCharts();
