@@ -3,55 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>點餐計價系統</title>
-    <!-- 引入 Tailwind CSS -->
+    <title>點餐計價系統 (Firebase 版本)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 Chart.js 圖表庫 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- 引入 SheetJS (xlsx) 用於匯出 Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <style>
-        /* 使用 Google 字體 Inter 和 Noto Sans TC */
+        /* Using Google Fonts Inter and Noto Sans TC */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
         html {
-            scroll-behavior: smooth; /* 讓頁面滾動更平滑 */
+            scroll-behavior: smooth; /* Smooth page scrolling */
         }
         body {
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
         }
-        /* 按鈕點擊時的動畫效果 */
+        /* Animation effect for button press */
         .btn-press {
             transform: scale(0.95);
             transition: transform 0.1s ease-in-out;
         }
-        /* 項目被選中時的樣式 */
+        /* Style for selected items */
         .item-selected {
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
             background-color: #EBF8FF;
         }
-        /* 禁用按鈕的樣式 */
+        /* Style for disabled buttons */
         .disabled-btn {
             opacity: 0.5;
             cursor: not-allowed;
-            background-color: #9CA3AF; /* 更明顯的禁用顏色 */
+            background-color: #9CA3AF; /* More prominent disabled color */
+        }
+        /* Styles for the confirmation modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-backdrop.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            width: 90%;
+            max-width: 400px;
+        }
+        .modal-backdrop.visible .modal-content {
+            transform: scale(1);
         }
     </style>
 </head>
 <body class="bg-gray-100 p-2 sm:p-4">
 
-    <!-- 主容器 -->
     <div class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
         
-        <!-- 主內容區塊 -->
         <div class="w-full pt-6">
-            <!-- 商品列表容器 (Grid 佈局) -->
             <div id="items-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                <!-- 菜單項目與重設按鈕將會被插入到這裡 -->
-            </div>
+                </div>
 
-            <!-- 控制區塊 -->
             <div class="mt-6">
-                <!-- 總金額方格 -->
                 <div class="bg-blue-600 text-white p-4 rounded-lg w-full flex items-center justify-between shadow-lg">
                     <h2 class="text-lg font-semibold">總金額</h2>
                     <span id="total-price" class="text-2xl font-bold">NT$ 0</span>
@@ -60,13 +84,9 @@
         </div>
     </div>
 
-    <!-- 訂單記錄區塊 -->
     <div id="order-log-section" class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl md:text-2xl font-bold text-gray-800">訂單記錄</h2>
-            <button id="clear-log-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-600 transition-all">
-                全部清除
-            </button>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border border-gray-200">
@@ -79,19 +99,22 @@
                     </tr>
                 </thead>
                 <tbody id="order-log-body">
-                    <!-- 訂單記錄將會被插入到這裡 -->
-                </tbody>
+                    </tbody>
             </table>
         </div>
     </div>
 
-    <!-- 商品銷售總表 -->
     <div id="summary-section" class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl md:text-2xl font-bold text-gray-800">商品銷售總表</h2>
-            <button id="export-excel-btn" class="bg-teal-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-600 transition-all">
-                匯出 Excel
-            </button>
+            <div class="flex items-center gap-2">
+                <button id="clear-log-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-600 transition-all">
+                    全部清除
+                </button>
+                <button id="export-excel-btn" class="bg-teal-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-600 transition-all">
+                    匯出 Excel
+                </button>
+            </div>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border border-gray-200" id="sales-summary-table">
@@ -103,16 +126,13 @@
                     </tr>
                 </thead>
                 <tbody id="sales-summary-body">
-                    <!-- 銷售總結將會被插入到這裡 -->
-                </tbody>
+                    </tbody>
                 <tfoot id="sales-summary-footer">
-                    <!-- 當日總金額將會被插入到這裡 -->
-                </tfoot>
+                    </tfoot>
             </table>
         </div>
     </div>
 
-    <!-- 統計圖表區塊 -->
     <div id="charts-section" class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6">
         <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">銷售統計圖表</h2>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -126,11 +146,40 @@
             </div>
         </div>
     </div>
+
+    <div id="confirmation-modal" class="modal-backdrop">
+        <div class="modal-content text-center">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">確認操作</h3>
+            <p class="text-gray-600 mb-6">您確定要清除所有訂單記錄和銷售數據嗎？此操作將會自動儲存一份最終結算 Excel 檔。</p>
+            <div class="flex justify-center gap-4">
+                <button id="confirm-clear-btn" class="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition-all">確定清除</button>
+                <button id="cancel-clear-btn" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-semibold hover:bg-gray-400 transition-all">取消</button>
+            </div>
+        </div>
+    </div>
     
     <script>
+        const __firebase_config = JSON.stringify({
+            apiKey: "AIzaSyAC-x70O8KtGisc5UYPCswZBFqoCQ7QHhE",
+            authDomain: "ordersystem-59b34.firebaseapp.com",
+            projectId: "ordersystem-59b34",
+            storageBucket: "ordersystem-59b34.firebasestorage.app",
+            messagingSenderId: "629971361276",
+            appId: "1:629971361276:web:8a589a46aad00aabade679",
+            measurementId: "G-Q3N7SYT3CE"
+        });
+        const __app_id = "1:629971361276:web:8a589a46aad00aabade679";
+    </script>
+
+    <script type="module">
+        // --- Firebase SDK Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, addDoc, onSnapshot, collection, query, getDocs, writeBatch, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         document.addEventListener('DOMContentLoaded', function () {
             
-            // --- 資料定義 ---
+            // --- Global Variables & Data Definitions ---
             const menuItems = [
                 { id: 2, name: '蛋絲、火腿涼麵', price: 70, emoji: '🍜' },
                 { id: 3, name: '燻雞涼麵', price: 80, emoji: '🍜' },
@@ -144,12 +193,15 @@
                 { id: 11, name: '舒跑', price: 30, emoji: '🥤' },
                 { id: 8, name: '炸物', price: 30, emoji: '🍟' }
             ];
-            let orderCounter = 1;
             let salesData = {};
             let quantityChartInstance = null;
             let revenueChartInstance = null;
 
-            // --- 元素選取 ---
+            // Firebase variables
+            let db, auth, userId;
+            let unsubscribeOrders, unsubscribeSummary;
+
+            // --- Element Selection ---
             const itemsContainer = document.getElementById('items-container');
             const totalPriceEl = document.getElementById('total-price');
             const orderLogBody = document.getElementById('order-log-body');
@@ -159,9 +211,13 @@
             const revenueChartCtx = document.getElementById('revenueChart').getContext('2d');
             const salesSummaryBody = document.getElementById('sales-summary-body');
             const salesSummaryFooter = document.getElementById('sales-summary-footer');
+            const modal = document.getElementById('confirmation-modal');
+            const confirmClearBtn = document.getElementById('confirm-clear-btn');
+            const cancelClearBtn = document.getElementById('cancel-clear-btn');
 
-            // --- 函式定義 ---
+            // --- Core Functions ---
 
+            // Initializes sales data structure
             function initializeSalesData() {
                 salesData = {};
                 menuItems.forEach(item => {
@@ -169,14 +225,13 @@
                 });
             }
 
+            // Renders or updates the sales charts
             function renderCharts() {
                 const labels = menuItems.map(item => item.name);
-                const quantityData = labels.map(label => salesData[label].quantity);
-                const revenueData = labels.map(label => salesData[label].revenue);
+                const quantityData = labels.map(label => salesData[label]?.quantity || 0);
+                const revenueData = labels.map(label => salesData[label]?.revenue || 0);
 
-                if (quantityChartInstance) {
-                    quantityChartInstance.destroy();
-                }
+                if (quantityChartInstance) quantityChartInstance.destroy();
                 quantityChartInstance = new Chart(quantityChartCtx, {
                     type: 'bar',
                     data: {
@@ -192,9 +247,7 @@
                     options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
                 });
 
-                if (revenueChartInstance) {
-                    revenueChartInstance.destroy();
-                }
+                if (revenueChartInstance) revenueChartInstance.destroy();
                 revenueChartInstance = new Chart(revenueChartCtx, {
                     type: 'bar',
                     data: {
@@ -211,13 +264,14 @@
                 });
             }
 
+            // Renders the sales summary table
             function renderSalesSummaryTable() {
                 salesSummaryBody.innerHTML = '';
                 let totalDailyRevenue = 0;
 
                 menuItems.forEach(item => {
                     const itemName = item.name;
-                    const data = salesData[itemName];
+                    const data = salesData[itemName] || { quantity: 0, revenue: 0 };
                     totalDailyRevenue += data.revenue;
                     const rowHTML = `
                         <tr class="hover:bg-gray-50">
@@ -237,6 +291,7 @@
                 `;
             }
             
+            // Renders the menu item buttons
             function renderMenuItems() {
                 itemsContainer.innerHTML = '';
                 
@@ -266,6 +321,7 @@
                 itemsContainer.insertAdjacentHTML('beforeend', resetBtnHTML);
             }
 
+            // Updates total price and item styles
             function updateTotal() {
                 let currentTotal = 0;
                 const items = document.querySelectorAll('.item'); 
@@ -289,7 +345,8 @@
                 return currentTotal;
             }
             
-            function exportSalesSummaryToExcel() {
+            // Exports sales summary to an Excel file
+            function exportSalesSummaryToExcel(isFinal = false) {
                 let totalDailyRevenue = 0;
                 const excelData = [
                     ['商品', '總數量', '總金額 (NT$)']
@@ -297,7 +354,7 @@
 
                 menuItems.forEach(item => {
                     const itemName = item.name;
-                    const data = salesData[itemName];
+                    const data = salesData[itemName] || { quantity: 0, revenue: 0 };
                     totalDailyRevenue += data.revenue;
                     excelData.push([itemName, data.quantity, data.revenue]);
                 });
@@ -311,95 +368,154 @@
 
                 const today = new Date();
                 const dateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-                const filename = `銷售總表_${dateString}.xlsx`;
+                
+                let filename;
+                if (isFinal) {
+                    const timeString = `${String(today.getHours()).padStart(2, '0')}${String(today.getMinutes()).padStart(2, '0')}${String(today.getSeconds()).padStart(2, '0')}`;
+                    filename = `最終結算總表_${dateString}_${timeString}.xlsx`;
+                } else {
+                    filename = `銷售總表_${dateString}.xlsx`;
+                }
 
                 XLSX.writeFile(wb, filename);
             }
 
-            function logOrder() {
+            // --- Firebase Functions ---
+
+            // Logs the current order to Firestore
+            async function logOrder() {
                 const currentTotal = updateTotal();
-                if (currentTotal === 0) {
-                    return;
-                }
+                if (currentTotal === 0) return;
 
                 const items = document.querySelectorAll('.item');
-                let itemSummary = [];
+                let orderedItems = [];
+                let salesUpdate = { ...salesData }; // Create a mutable copy
 
                 items.forEach(item => {
                     const quantity = parseInt(item.querySelector('.quantity').textContent);
                     if (quantity > 0) {
                         const name = item.dataset.name;
                         const price = parseInt(item.dataset.price);
-                        itemSummary.push(`${name} x ${quantity}`);
+                        orderedItems.push({ name, quantity, price });
                         
-                        salesData[name].quantity += quantity;
-                        salesData[name].revenue += quantity * price;
+                        salesUpdate[name].quantity += quantity;
+                        salesUpdate[name].revenue += quantity * price;
                     }
                 });
 
-                const timestamp = new Date().toLocaleString('zh-TW', { hour12: false });
-                const itemDetailsHTML = itemSummary.join('<br>');
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const summaryRef = doc(db, `artifacts/${appId}/users/${userId}/posData/summary`);
+                const ordersCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/posData/summary/orders`);
 
-                const newRowHTML = `
-                    <tr class="hover:bg-gray-50">
-                        <td class="py-2 px-4 border-b">${orderCounter}</td>
-                        <td class="py-2 px-4 border-b">${itemDetailsHTML}</td>
-                        <td class="py-2 px-4 border-b">NT$ ${currentTotal}</td>
-                        <td class="py-2 px-4 border-b text-sm text-gray-500">${timestamp}</td>
-                    </tr>
-                `;
+                try {
+                    // Use a batch write to update summary and add a new order
+                    const batch = writeBatch(db);
+                    
+                    // Add new order document
+                    batch.set(doc(ordersCollectionRef), {
+                        items: orderedItems,
+                        total: currentTotal,
+                        createdAt: serverTimestamp()
+                    });
 
-                orderLogBody.insertAdjacentHTML('afterbegin', newRowHTML);
-                orderCounter++;
+                    // Update the summary document
+                    batch.update(summaryRef, { salesData: salesUpdate });
+                    
+                    await batch.commit();
 
-                // 更新完數據後，儲存到 localStorage
-                saveDataToLocalStorage();
+                    // Reset UI after successful submission
+                    const allQuantities = document.querySelectorAll('.quantity');
+                    allQuantities.forEach(quantityEl => {
+                        quantityEl.textContent = '0';
+                    });
+                    updateTotal();
 
-                renderCharts();
-                renderSalesSummaryTable();
-
-                const allQuantities = document.querySelectorAll('.quantity');
-                allQuantities.forEach(quantityEl => {
-                    quantityEl.textContent = '0';
-                });
-                updateTotal();
-            }
-
-            // --- LocalStorage 相關函式 ---
-            function saveDataToLocalStorage() {
-                localStorage.setItem('posSalesData', JSON.stringify(salesData));
-                localStorage.setItem('posOrderCounter', orderCounter.toString());
-                localStorage.setItem('posOrderLogHTML', orderLogBody.innerHTML);
-            }
-
-            function loadDataFromLocalStorage() {
-                const savedSalesData = localStorage.getItem('posSalesData');
-                const savedOrderCounter = localStorage.getItem('posOrderCounter');
-                const savedOrderLogHTML = localStorage.getItem('posOrderLogHTML');
-
-                if (savedSalesData) {
-                    salesData = JSON.parse(savedSalesData);
-                    orderCounter = parseInt(savedOrderCounter, 10);
-                    orderLogBody.innerHTML = savedOrderLogHTML;
-                } else {
-                    initializeSalesData();
+                } catch (error) {
+                    console.error("Error logging order: ", error);
                 }
             }
 
-            function clearAllData() {
-                // 清除 localStorage
-                localStorage.removeItem('posSalesData');
-                localStorage.removeItem('posOrderCounter');
-                localStorage.removeItem('posOrderLogHTML');
+            // Clears all data from Firestore after exporting
+            async function clearAllData() {
+                // First, export the final data to Excel
+                exportSalesSummaryToExcel(true);
 
-                // 重設 UI 和變數
-                orderLogBody.innerHTML = '';
-                orderCounter = 1;
-                initializeSalesData();
-                renderCharts();
-                renderSalesSummaryTable();
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const summaryRef = doc(db, `artifacts/${appId}/users/${userId}/posData/summary`);
+                const ordersCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/posData/summary/orders`);
+
+                try {
+                    // Reset summary document
+                    initializeSalesData();
+                    await setDoc(summaryRef, { salesData: salesData });
+
+                    // Delete all documents in the orders subcollection
+                    const querySnapshot = await getDocs(ordersCollectionRef);
+                    const batch = writeBatch(db);
+                    querySnapshot.forEach((doc) => {
+                        batch.delete(doc.ref);
+                    });
+                    await batch.commit();
+
+                } catch (error) {
+                    console.error("Error clearing data: ", error);
+                }
+                modal.classList.remove('visible');
             }
-            
+
+            // Sets up real-time listeners for Firestore data
+            function setupFirestoreListeners() {
+                if (!userId) return;
+                
+                // Detach previous listeners if they exist
+                if (unsubscribeSummary) unsubscribeSummary();
+                if (unsubscribeOrders) unsubscribeOrders();
+
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const summaryRef = doc(db, `artifacts/${appId}/users/${userId}/posData/summary`);
+                const ordersCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/posData/summary/orders`);
+
+                // Listener for sales summary data
+                unsubscribeSummary = onSnapshot(summaryRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        salesData = docSnap.data().salesData;
+                    } else {
+                        // If summary doesn't exist, create it
+                        initializeSalesData();
+                        setDoc(summaryRef, { salesData: salesData });
+                    }
+                    renderSalesSummaryTable();
+                    renderCharts();
+                }, (error) => {
+                    console.error("Error listening to summary:", error);
+                });
+
+                // Listener for order log data
+                const q = query(ordersCollectionRef, orderBy("createdAt", "desc"));
+                unsubscribeOrders = onSnapshot(q, (querySnapshot) => {
+                    orderLogBody.innerHTML = '';
+                    let counter = querySnapshot.size;
+                    querySnapshot.forEach((doc) => {
+                        const order = doc.data();
+                        const timestamp = order.createdAt ? order.createdAt.toDate().toLocaleString('zh-TW', { hour12: false }) : 'N/A';
+                        const itemDetailsHTML = order.items.map(i => `${i.name} x ${i.quantity}`).join('<br>');
+                        
+                        const newRowHTML = `
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-2 px-4 border-b">${counter--}</td>
+                                <td class="py-2 px-4 border-b">${itemDetailsHTML}</td>
+                                <td class="py-2 px-4 border-b">NT$ ${order.total}</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-500">${timestamp}</td>
+                            </tr>
+                        `;
+                        orderLogBody.insertAdjacentHTML('beforeend', newRowHTML);
+                    });
+                }, (error) => {
+                    console.error("Error listening to orders:", error);
+                });
+            }
+
+            // --- Event Listeners ---
             function setupEventListeners() {
                 itemsContainer.addEventListener('click', (e) => {
                     const item = e.target.closest('.item');
@@ -419,9 +535,7 @@
                     let quantity = parseInt(quantityEl.textContent);
                     
                     if (minusBtn) {
-                        if (quantity > 0) {
-                            quantity--;
-                        }
+                        if (quantity > 0) quantity--;
                         minusBtn.classList.add('btn-press');
                         setTimeout(() => minusBtn.classList.remove('btn-press'), 100);
                     } 
@@ -435,26 +549,69 @@
                     updateTotal();
                 });
 
-                clearLogBtn.addEventListener('click', () => {
-                    clearAllData();
-                    clearLogBtn.classList.add('btn-press');
-                    setTimeout(() => clearLogBtn.classList.remove('btn-press'), 100);
-                });
-
+                // Modal event listeners
+                clearLogBtn.addEventListener('click', () => modal.classList.add('visible'));
+                cancelClearBtn.addEventListener('click', () => modal.classList.remove('visible'));
+                confirmClearBtn.addEventListener('click', clearAllData);
+                
                 exportExcelBtn.addEventListener('click', () => {
-                    exportSalesSummaryToExcel();
+                    exportSalesSummaryToExcel(false); // Manual export is not final
                     exportExcelBtn.classList.add('btn-press');
                     setTimeout(() => exportExcelBtn.classList.remove('btn-press'), 100);
                 });
             }
 
-            // --- 初始化 ---
-            loadDataFromLocalStorage(); // 載入儲存的資料
-            renderMenuItems();
-            updateTotal();
-            renderCharts();
-            renderSalesSummaryTable();
-            setupEventListeners(); 
+            // --- Initialization ---
+            async function initializeAppAndAuth() {
+                try {
+                    // Use __firebase_config if available, otherwise use a placeholder
+                    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+                        ? JSON.parse(__firebase_config) 
+                        : { apiKey: "...", authDomain: "...", projectId: "...", storageBucket: "...", messagingSenderId: "...", appId: "..." };
+
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            console.log("User authenticated with UID:", userId);
+                            setupFirestoreListeners(); // Set up listeners once we have a user
+                        } else {
+                            console.log("User is not signed in.");
+                            // Detach listeners if user signs out
+                            if (unsubscribeSummary) unsubscribeSummary();
+                            if (unsubscribeOrders) unsubscribeOrders();
+                        }
+                    });
+
+                    // Sign in the user
+                    if (typeof __initial_auth_token !== 'undefined') {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+
+                } catch (error) {
+                    console.error("Firebase initialization failed:", error);
+                    // Display an error message to the user on the page
+                    document.body.innerHTML = `<div class="p-8 text-center text-red-600 bg-red-100">Firebase 初始化失敗，請檢查設定。錯誤: ${error.message}</div>`;
+                }
+            }
+            
+            // --- App Start ---
+            async function main() {
+                renderMenuItems();
+                updateTotal();
+                initializeSalesData(); // Initialize with empty data first
+                renderCharts(); // Render empty charts
+                renderSalesSummaryTable(); // Render empty table
+                setupEventListeners(); 
+                await initializeAppAndAuth(); // Connect to Firebase
+            }
+
+            main();
         });
     </script>
 </body>
