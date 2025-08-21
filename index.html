@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>點餐計價系統</title>
+    <!-- Web App Manifest for offline capabilities -->
+    <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;點餐計價系統&quot;,&quot;short_name&quot;:&quot;點餐系統&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#ffffff&quot;,&quot;theme_color&quot;:&quot;#4A90E2&quot;}">
+    <meta name="theme-color" content="#4A90E2">
+
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Chart.js 圖表庫 -->
@@ -90,9 +94,6 @@
                  <button id="clear-log-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-600 transition-all">
                     全部清除並備份
                 </button>
-                <button id="export-excel-btn" class="bg-teal-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-600 transition-all">
-                    匯出 Excel
-                </button>
             </div>
         </div>
         <div class="overflow-x-auto">
@@ -168,7 +169,6 @@
             const totalPriceEl = document.getElementById('total-price');
             const orderLogBody = document.getElementById('order-log-body');
             const clearLogBtn = document.getElementById('clear-log-btn');
-            const exportExcelBtn = document.getElementById('export-excel-btn');
             const quantityChartCtx = document.getElementById('quantityChart').getContext('2d');
             const revenueChartCtx = document.getElementById('revenueChart').getContext('2d');
             const salesSummaryBody = document.getElementById('sales-summary-body');
@@ -308,28 +308,30 @@
             }
             
             function exportSalesSummaryToExcel() {
+                // --- 建立銷售總表資料 ---
                 let totalDailyRevenue = 0;
-                const excelData = [
+                const summaryData = [
                     ['商品', '總數量', '總金額 (NT$)']
                 ];
-
                 menuItems.forEach(item => {
                     const itemName = item.name;
                     const data = salesData[itemName];
                     totalDailyRevenue += data.revenue;
-                    excelData.push([itemName, data.quantity, data.revenue]);
+                    summaryData.push([itemName, data.quantity, data.revenue]);
                 });
+                summaryData.push([]);
+                summaryData.push(['當日總金額', '', totalDailyRevenue]);
+                const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
 
-                excelData.push([]);
-                excelData.push(['當日總金額', '', totalDailyRevenue]);
-
-                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                // --- 建立只包含一個工作表的 Excel 檔案 ---
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, '銷售總表');
+                XLSX.utils.book_append_sheet(wb, wsSummary, '銷售總表');
 
+                // --- 產生檔名並下載 ---
                 const today = new Date();
                 const dateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-                const filename = `銷售總表_備份_${dateString}.xlsx`;
+                const timeString = `${String(today.getHours()).padStart(2, '0')}-${String(today.getMinutes()).padStart(2, '0')}-${String(today.getSeconds()).padStart(2, '0')}`;
+                const filename = `銷售總表_備份_${dateString}_${timeString}.xlsx`;
 
                 XLSX.writeFile(wb, filename);
             }
@@ -479,12 +481,6 @@
                 modalCancelBtn.addEventListener('click', () => {
                     hideConfirmModal();
                 });
-
-                exportExcelBtn.addEventListener('click', () => {
-                    exportSalesSummaryToExcel();
-                    exportExcelBtn.classList.add('btn-press');
-                    setTimeout(() => exportExcelBtn.classList.remove('btn-press'), 100);
-                });
             }
 
             // --- 初始化 ---
@@ -495,6 +491,58 @@
             renderSalesSummaryTable();
             setupEventListeners(); 
         });
+
+        // --- Service Worker for Offline Capability ---
+        if ('serviceWorker' in navigator) {
+            const swJS = `
+                const CACHE_NAME = 'pos-system-cache-v1';
+                const urlsToCache = [
+                    '/',
+                    'https://cdn.tailwindcss.com',
+                    'https://cdn.jsdelivr.net/npm/chart.js',
+                    'https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js',
+                    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap',
+                    'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2',
+                    'https://fonts.gstatic.com/s/notosanstc/v40/TuGOUg-eNqGYqsN7UYEwBx_C-j2f-EzhbqE.woff2'
+                ];
+
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                console.log('Opened cache');
+                                // 使用 no-cors 模式來快取跨來源資源
+                                const requests = urlsToCache.map(url => new Request(url, { mode: 'no-cors' }));
+                                return cache.addAll(requests);
+                            })
+                    );
+                });
+
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => {
+                                if (response) {
+                                    return response;
+                                }
+                                return fetch(event.request).catch(() => caches.match('/'));
+                            })
+                    );
+                });
+            `;
+            const blob = new Blob([swJS], { type: 'application/javascript' });
+            const swURL = URL.createObjectURL(blob);
+
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register(swURL)
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
