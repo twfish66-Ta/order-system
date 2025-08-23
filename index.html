@@ -44,39 +44,39 @@
 <body class="bg-gray-100 p-2 sm:p-4">
 
     <!-- 主容器 -->
-    <div class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
+    <div class="w-full max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
         
         <!-- 主內容區塊 -->
         <div class="w-full pt-6">
             <!-- 商品列表容器 (Grid 佈局) -->
-            <div id="items-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                <!-- 菜單項目與重設按鈕將會被插入到這裡 -->
+            <div id="items-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                <!-- 菜單項目和送出訂單按鈕將會被插入到這裡 -->
             </div>
 
             <!-- 控制區塊 -->
             <div class="mt-6">
                 <!-- 總金額方格 -->
                 <div class="bg-blue-600 text-white p-4 rounded-lg w-full flex items-center justify-between shadow-lg">
-                    <h2 class="text-lg font-semibold">總金額</h2>
-                    <span id="total-price" class="text-2xl font-bold">NT$ 0</span>
+                    <h2 class="text-xl sm:text-2xl font-semibold">總金額</h2>
+                    <span id="total-price" class="text-3xl sm:text-4xl font-bold">NT$ 0</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 訂單記錄區塊 -->
-    <div id="order-log-section" class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
+    <div id="order-log-section" class="w-full max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl md:text-2xl font-bold text-gray-800">訂單記錄</h2>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">訂單記錄</h2>
         </div>
         <div class="overflow-x-auto">
-            <table class="min-w-full bg-white border border-gray-200">
+            <table class="min-w-full bg-white border border-gray-200 text-lg sm:text-xl">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">訂單編號</th>
-                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">品項</th>
-                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">總金額</th>
-                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">時間</th>
+                        <th class="py-2 px-3 sm:py-3 sm:px-5 border-b text-left text-base sm:text-lg font-semibold text-gray-600">訂單編號</th>
+                        <th class="py-2 px-3 sm:py-3 sm:px-5 border-b text-left text-base sm:text-lg font-semibold text-gray-600">品項</th>
+                        <th class="py-2 px-3 sm:py-3 sm:px-5 border-b text-left text-base sm:text-lg font-semibold text-gray-600">總金額</th>
+                        <th class="py-2 px-3 sm:py-3 sm:px-5 border-b text-left text-base sm:text-lg font-semibold text-gray-600">時間</th>
                     </tr>
                 </thead>
                 <tbody id="order-log-body">
@@ -84,25 +84,29 @@
                 </tbody>
             </table>
         </div>
+        <!-- 分頁控制器 -->
+        <div id="pagination-controls" class="mt-4 sm:mt-6 flex justify-center items-center space-x-2 sm:space-x-6">
+            <!-- 分頁按鈕將會被插入到這裡 -->
+        </div>
     </div>
 
     <!-- 商品銷售總表 -->
-    <div id="summary-section" class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
+    <div id="summary-section" class="w-full max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6 mb-8">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl md:text-2xl font-bold text-gray-800">商品銷售總表</h2>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">商品銷售總表</h2>
             <div class="flex items-center space-x-2">
-                 <button id="clear-log-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-600 transition-all">
+                 <button id="clear-log-btn" class="bg-red-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg text-base sm:text-lg font-bold hover:bg-red-600 transition-all">
                     全部清除並備份
                 </button>
             </div>
         </div>
         <div class="overflow-x-auto">
-            <table class="min-w-full bg-white border border-gray-200" id="sales-summary-table">
+            <table class="min-w-full bg-white border border-gray-200 text-lg sm:text-xl" id="sales-summary-table">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">商品</th>
-                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">總數量</th>
-                        <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-600">總金額 (NT$)</th>
+                        <th class="py-2 px-3 sm:py-3 sm:px-5 border-b text-left text-base sm:text-lg font-semibold text-gray-600">商品</th>
+                        <th class="py-2 px-3 sm:py-3 sm:px-5 border-b text-left text-base sm:text-lg font-semibold text-gray-600">總數量</th>
+                        <th class="py-2 px-3 sm:py-3 sm:px-5 border-b text-left text-base sm:text-lg font-semibold text-gray-600">總金額 (NT$)</th>
                     </tr>
                 </thead>
                 <tbody id="sales-summary-body">
@@ -116,15 +120,15 @@
     </div>
 
     <!-- 統計圖表區塊 -->
-    <div id="charts-section" class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6">
-        <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">銷售統計圖表</h2>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div id="charts-section" class="w-full max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-3 md:p-6">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 sm:mb-6">銷售統計圖表</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             <div>
-                <h3 class="text-lg font-semibold text-center text-gray-700 mb-2">商品銷售數量</h3>
+                <h3 class="text-xl sm:text-2xl font-semibold text-center text-gray-700 mb-2 sm:mb-3">商品銷售數量</h3>
                 <canvas id="quantityChart"></canvas>
             </div>
             <div>
-                <h3 class="text-lg font-semibold text-center text-gray-700 mb-2">商品銷售金額 (NT$)</h3>
+                <h3 class="text-xl sm:text-2xl font-semibold text-center text-gray-700 mb-2 sm:mb-3">商品銷售金額 (NT$)</h3>
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
@@ -132,12 +136,12 @@
 
     <!-- Custom Confirmation Modal -->
     <div id="custom-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-4">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">確認操作</h3>
-            <p id="modal-text" class="text-gray-600 mb-6">您確定要清除所有訂單記錄和銷售數據嗎？此操作無法復原。</p>
+        <div class="bg-white rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-sm sm:max-w-md mx-4">
+            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4">確認操作</h3>
+            <p id="modal-text" class="text-gray-600 mb-6 sm:mb-8 text-lg sm:text-xl">您確定要清除所有訂單記錄和銷售數據嗎？此操作無法復原。</p>
             <div class="flex justify-end space-x-4">
-                <button id="modal-cancel-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">取消</button>
-                <button id="modal-confirm-btn" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">確定清除</button>
+                <button id="modal-cancel-btn" class="px-4 py-2 sm:px-6 sm:py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-lg sm:text-xl">取消</button>
+                <button id="modal-confirm-btn" class="px-4 py-2 sm:px-6 sm:py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-lg sm:text-xl">確定清除</button>
             </div>
         </div>
     </div>
@@ -147,20 +151,26 @@
             
             // --- 資料定義 ---
             const menuItems = [
-                { id: 2, name: '蛋絲、火腿涼麵', price: 70, emoji: '🍜' },
+                { id: 2, name: '蛋絲涼麵', price: 70, emoji: '🍜' },
+                { id: 12, name: '火腿涼麵', price: 70, emoji: '🍜' },
                 { id: 3, name: '燻雞涼麵', price: 80, emoji: '🍜' },
                 { id: 4, name: '松坂肉涼麵', price: 90, emoji: '🍜' },
                 { id: 5, name: '燒肉刈包', price: 85, emoji: '🍔' },
                 { id: 6, name: '鴨賞刈包', price: 95, emoji: '🍔' },
+                { id: 13, name: '素食刈包', price: 60, emoji: '🌿' },
                 { id: 7, name: '加蛋', price: 15, emoji: '🥚' },
                 { id: 1, name: '冰紅茶', price: 25, emoji: '🥤' },
                 { id: 9, name: '冰沙', price: 50, emoji: '🍧' },
                 { id: 10, name: '竹炭水', price: 20, emoji: '💧' },
                 { id: 11, name: '舒跑', price: 30, emoji: '🥤' },
-                { id: 8, name: '炸物', price: 30, emoji: '🍟' }
+                { id: 8, name: '炸物', price: 30, emoji: '🍟' },
+                { id: 14, name: '雞翅四隻', price: 100, emoji: '🍗' }
             ];
             let orderCounter = 1;
             let salesData = {};
+            let allOrders = []; // 用於儲存所有訂單
+            let currentPage = 1;
+            const ordersPerPage = 10;
             let quantityChartInstance = null;
             let revenueChartInstance = null;
 
@@ -168,6 +178,7 @@
             const itemsContainer = document.getElementById('items-container');
             const totalPriceEl = document.getElementById('total-price');
             const orderLogBody = document.getElementById('order-log-body');
+            const paginationControls = document.getElementById('pagination-controls');
             const clearLogBtn = document.getElementById('clear-log-btn');
             const quantityChartCtx = document.getElementById('quantityChart').getContext('2d');
             const revenueChartCtx = document.getElementById('revenueChart').getContext('2d');
@@ -189,12 +200,10 @@
 
             function renderCharts() {
                 const labels = menuItems.map(item => item.name);
-                const quantityData = labels.map(label => salesData[label].quantity);
-                const revenueData = labels.map(label => salesData[label].revenue);
+                const quantityData = labels.map(label => salesData[label] ? salesData[label].quantity : 0);
+                const revenueData = labels.map(label => salesData[label] ? salesData[label].revenue : 0);
 
-                if (quantityChartInstance) {
-                    quantityChartInstance.destroy();
-                }
+                if (quantityChartInstance) quantityChartInstance.destroy();
                 quantityChartInstance = new Chart(quantityChartCtx, {
                     type: 'bar',
                     data: {
@@ -210,9 +219,7 @@
                     options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
                 });
 
-                if (revenueChartInstance) {
-                    revenueChartInstance.destroy();
-                }
+                if (revenueChartInstance) revenueChartInstance.destroy();
                 revenueChartInstance = new Chart(revenueChartCtx, {
                     type: 'bar',
                     data: {
@@ -235,13 +242,13 @@
 
                 menuItems.forEach(item => {
                     const itemName = item.name;
-                    const data = salesData[itemName];
+                    const data = salesData[itemName] || { quantity: 0, revenue: 0 };
                     totalDailyRevenue += data.revenue;
                     const rowHTML = `
                         <tr class="hover:bg-gray-50">
-                            <td class="py-2 px-4 border-b">${itemName}</td>
-                            <td class="py-2 px-4 border-b">${data.quantity}</td>
-                            <td class="py-2 px-4 border-b">${data.revenue}</td>
+                            <td class="py-2 px-3 sm:py-3 sm:px-5 border-b">${itemName}</td>
+                            <td class="py-2 px-3 sm:py-3 sm:px-5 border-b">${data.quantity}</td>
+                            <td class="py-2 px-3 sm:py-3 sm:px-5 border-b">${data.revenue}</td>
                         </tr>
                     `;
                     salesSummaryBody.insertAdjacentHTML('beforeend', rowHTML);
@@ -249,36 +256,36 @@
 
                 salesSummaryFooter.innerHTML = `
                     <tr class="bg-gray-100 font-bold">
-                        <td class="py-3 px-4" colspan="2">當日總金額</td>
-                        <td class="py-3 px-4">${totalDailyRevenue}</td>
+                        <td class="py-3 px-4 sm:py-4 sm:px-5" colspan="2">當日總金額</td>
+                        <td class="py-3 px-4 sm:py-4 sm:px-5">${totalDailyRevenue}</td>
                     </tr>
                 `;
             }
             
-            function renderMenuItems() {
+            function renderMenuItemsAndSubmit() {
                 itemsContainer.innerHTML = '';
                 
                 menuItems.forEach(itemData => {
                     const itemHTML = `
-                        <div class="item relative flex flex-col items-center justify-around bg-white p-2 rounded-lg transition-all duration-200 h-28 cursor-pointer border-2 border-transparent shadow-md hover:shadow-lg" data-id="${itemData.id}" data-price="${itemData.price}" data-name="${itemData.name}">
+                        <div class="item relative flex flex-col items-center justify-around bg-white p-2 rounded-lg transition-all duration-200 h-28 sm:h-32 cursor-pointer border-2 border-transparent shadow-md hover:shadow-lg" data-id="${itemData.id}" data-price="${itemData.price}" data-name="${itemData.name}">
                             <div class="text-center">
-                                <span class="text-3xl">${itemData.emoji}</span>
-                                <p class="text-base font-semibold text-gray-800 leading-tight">${itemData.name}</p>
-                                <p class="text-base text-gray-500">NT$ ${itemData.price}</p>
+                                <span class="text-2xl sm:text-3xl">${itemData.emoji}</span>
+                                <p class="text-sm sm:text-base font-semibold text-gray-800 leading-tight mt-1">${itemData.name}</p>
+                                <p class="text-sm sm:text-base text-gray-500">NT$ ${itemData.price}</p>
                             </div>
                             <div>
-                                <span class="quantity text-xl font-semibold text-gray-900 w-8 text-center">0</span>
+                                <span class="quantity text-lg sm:text-xl font-semibold text-gray-900 w-8 sm:w-10 text-center">0</span>
                             </div>
-                            <button class="minus-btn absolute bottom-1.5 right-1.5 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-lg font-bold shadow-md hover:bg-red-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 disabled-btn">-</button>
+                            <button class="minus-btn absolute bottom-1.5 right-1.5 bg-red-500 text-white rounded-full w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center text-lg sm:text-xl font-bold shadow-md hover:bg-red-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 disabled-btn">-</button>
                         </div>
                     `;
                     itemsContainer.insertAdjacentHTML('beforeend', itemHTML);
                 });
 
                 const resetBtnHTML = `
-                    <div id="reset-btn" class="flex flex-col items-center justify-center bg-green-500 p-2 rounded-lg transition-all duration-200 h-28 cursor-pointer shadow-md hover:bg-green-600 text-white">
-                        <span class="text-3xl">🛒</span>
-                        <p class="text-lg font-semibold mt-1 leading-tight">送出訂單</p>
+                    <div id="reset-btn" class="flex flex-col items-center justify-around bg-green-500 p-2 rounded-lg transition-all duration-200 h-28 sm:h-32 cursor-pointer shadow-md hover:bg-green-600 text-white">
+                        <span class="text-2xl sm:text-3xl">🛒</span>
+                        <p class="text-base sm:text-lg font-semibold mt-2 leading-tight">送出訂單</p>
                     </div>
                 `;
                 itemsContainer.insertAdjacentHTML('beforeend', resetBtnHTML);
@@ -291,9 +298,8 @@
                 items.forEach(item => {
                     const price = parseInt(item.dataset.price);
                     const quantity = parseInt(item.querySelector('.quantity').textContent);
-                    const minusBtn = item.querySelector('.minus-btn');
                     currentTotal += price * quantity;
-
+                    const minusBtn = item.querySelector('.minus-btn');
                     if (quantity > 0) {
                         item.classList.add('item-selected');
                         minusBtn.classList.remove('disabled-btn');
@@ -308,109 +314,131 @@
             }
             
             function exportSalesSummaryToExcel() {
-                // --- 建立銷售總表資料 ---
                 let totalDailyRevenue = 0;
-                const summaryData = [
-                    ['商品', '總數量', '總金額 (NT$)']
-                ];
+                const summaryData = [['商品', '總數量', '總金額 (NT$)']];
                 menuItems.forEach(item => {
                     const itemName = item.name;
-                    const data = salesData[itemName];
+                    const data = salesData[itemName] || { quantity: 0, revenue: 0 };
                     totalDailyRevenue += data.revenue;
                     summaryData.push([itemName, data.quantity, data.revenue]);
                 });
                 summaryData.push([]);
                 summaryData.push(['當日總金額', '', totalDailyRevenue]);
                 const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-
-                // --- 建立只包含一個工作表的 Excel 檔案 ---
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, wsSummary, '銷售總表');
-
-                // --- 產生檔名並下載 ---
                 const today = new Date();
                 const dateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                 const timeString = `${String(today.getHours()).padStart(2, '0')}-${String(today.getMinutes()).padStart(2, '0')}-${String(today.getSeconds()).padStart(2, '0')}`;
                 const filename = `銷售總表_備份_${dateString}_${timeString}.xlsx`;
-
                 XLSX.writeFile(wb, filename);
+            }
+
+            function renderOrderLog() {
+                orderLogBody.innerHTML = '';
+                paginationControls.innerHTML = '';
+
+                if (allOrders.length === 0) return;
+
+                const startIndex = (currentPage - 1) * ordersPerPage;
+                const endIndex = startIndex + ordersPerPage;
+                const currentOrders = allOrders.slice(startIndex, endIndex);
+
+                currentOrders.forEach(order => {
+                    const newRowHTML = `
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-2 px-3 sm:py-3 sm:px-5 border-b">${order.id}</td>
+                            <td class="py-2 px-3 sm:py-3 sm:px-5 border-b">${order.itemsHTML}</td>
+                            <td class="py-2 px-3 sm:py-3 sm:px-5 border-b">NT$ ${order.total}</td>
+                            <td class="py-2 px-3 sm:py-3 sm:px-5 border-b text-sm sm:text-base text-gray-500">${order.timestamp}</td>
+                        </tr>
+                    `;
+                    orderLogBody.insertAdjacentHTML('beforeend', newRowHTML);
+                });
+
+                renderPagination();
+            }
+
+            function renderPagination() {
+                const totalPages = Math.ceil(allOrders.length / ordersPerPage);
+                if (totalPages <= 1) return;
+
+                let paginationHTML = '';
+                const prevDisabled = currentPage === 1 ? 'disabled-btn' : '';
+                paginationHTML += `<button id="prev-page-btn" class="bg-blue-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg text-lg sm:text-xl font-bold hover:bg-blue-600 transition-all ${prevDisabled}">上一頁</button>`;
+                
+                paginationHTML += `<span class="font-semibold text-gray-700 text-xl sm:text-2xl">第 ${currentPage} / ${totalPages} 頁</span>`;
+
+                const nextDisabled = currentPage === totalPages ? 'disabled-btn' : '';
+                paginationHTML += `<button id="next-page-btn" class="bg-blue-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg text-lg sm:text-xl font-bold hover:bg-blue-600 transition-all ${nextDisabled}">下一頁</button>`;
+                
+                paginationControls.innerHTML = paginationHTML;
             }
 
             function logOrder() {
                 const currentTotal = updateTotal();
-                if (currentTotal === 0) {
-                    return;
-                }
+                if (currentTotal === 0) return;
 
                 const items = document.querySelectorAll('.item');
                 let itemSummary = [];
-
                 items.forEach(item => {
                     const quantity = parseInt(item.querySelector('.quantity').textContent);
                     if (quantity > 0) {
                         const name = item.dataset.name;
                         const price = parseInt(item.dataset.price);
                         itemSummary.push(`${name} x ${quantity}`);
-                        
                         salesData[name].quantity += quantity;
                         salesData[name].revenue += quantity * price;
                     }
                 });
 
-                const timestamp = new Date().toLocaleString('zh-TW', { hour12: false });
-                const itemDetailsHTML = itemSummary.join('<br>');
+                const newOrder = {
+                    id: orderCounter,
+                    itemsHTML: itemSummary.join('<br>'),
+                    total: currentTotal,
+                    timestamp: new Date().toLocaleString('zh-TW', { hour12: false })
+                };
 
-                const newRowHTML = `
-                    <tr class="hover:bg-gray-50">
-                        <td class="py-2 px-4 border-b">${orderCounter}</td>
-                        <td class="py-2 px-4 border-b">${itemDetailsHTML}</td>
-                        <td class="py-2 px-4 border-b">NT$ ${currentTotal}</td>
-                        <td class="py-2 px-4 border-b text-sm text-gray-500">${timestamp}</td>
-                    </tr>
-                `;
-
-                orderLogBody.insertAdjacentHTML('afterbegin', newRowHTML);
+                allOrders.unshift(newOrder);
                 orderCounter++;
-
+                
+                currentPage = 1;
+                renderOrderLog();
                 saveDataToLocalStorage();
                 renderCharts();
                 renderSalesSummaryTable();
 
-                const allQuantities = document.querySelectorAll('.quantity');
-                allQuantities.forEach(quantityEl => {
-                    quantityEl.textContent = '0';
-                });
+                document.querySelectorAll('.quantity').forEach(q => q.textContent = '0');
                 updateTotal();
             }
 
             function saveDataToLocalStorage() {
                 localStorage.setItem('posSalesData', JSON.stringify(salesData));
                 localStorage.setItem('posOrderCounter', orderCounter.toString());
-                localStorage.setItem('posOrderLogHTML', orderLogBody.innerHTML);
+                localStorage.setItem('posAllOrders', JSON.stringify(allOrders));
             }
 
             function loadDataFromLocalStorage() {
                 const savedSalesData = localStorage.getItem('posSalesData');
-                const savedOrderCounter = localStorage.getItem('posOrderCounter');
-                const savedOrderLogHTML = localStorage.getItem('posOrderLogHTML');
+                if (savedSalesData) salesData = JSON.parse(savedSalesData);
+                else initializeSalesData();
 
-                if (savedSalesData) {
-                    salesData = JSON.parse(savedSalesData);
-                    orderCounter = parseInt(savedOrderCounter, 10);
-                    orderLogBody.innerHTML = savedOrderLogHTML;
-                } else {
-                    initializeSalesData();
-                }
+                const savedOrderCounter = localStorage.getItem('posOrderCounter');
+                if (savedOrderCounter) orderCounter = parseInt(savedOrderCounter, 10);
+                
+                const savedOrders = localStorage.getItem('posAllOrders');
+                if (savedOrders) allOrders = JSON.parse(savedOrders);
             }
 
             function clearAllData() {
                 localStorage.removeItem('posSalesData');
                 localStorage.removeItem('posOrderCounter');
-                localStorage.removeItem('posOrderLogHTML');
-
-                orderLogBody.innerHTML = '';
+                localStorage.removeItem('posAllOrders');
+                allOrders = [];
                 orderCounter = 1;
+                currentPage = 1;
                 initializeSalesData();
+                renderOrderLog();
                 renderCharts();
                 renderSalesSummaryTable();
             }
@@ -426,7 +454,6 @@
             function setupEventListeners() {
                 itemsContainer.addEventListener('click', (e) => {
                     const item = e.target.closest('.item');
-                    const minusBtn = e.target.closest('.minus-btn');
                     const resetButton = e.target.closest('#reset-btn');
 
                     if (resetButton) {
@@ -438,37 +465,43 @@
 
                     if (!item) return;
 
+                    const minusBtn = e.target.closest('.minus-btn');
                     const quantityEl = item.querySelector('.quantity');
                     let quantity = parseInt(quantityEl.textContent);
-                    
+
                     if (minusBtn) {
-                        if (quantity > 0) {
-                            quantity--;
-                        }
+                        if (quantity > 0) quantity--;
                         minusBtn.classList.add('btn-press');
                         setTimeout(() => minusBtn.classList.remove('btn-press'), 100);
-                    } 
-                    else {
+                    } else {
                         quantity++;
                         item.classList.add('btn-press');
                         setTimeout(() => item.classList.remove('btn-press'), 100);
                     }
-                    
                     quantityEl.textContent = quantity;
                     updateTotal();
                 });
 
                 clearLogBtn.addEventListener('click', () => {
                     const hasSales = Object.values(salesData).some(item => item.quantity > 0);
-
                     if (hasSales) {
                         exportSalesSummaryToExcel();
                         modalText.textContent = '資料已成功備份為 Excel 檔案。您確定要清除所有紀錄嗎？此操作無法復原。';
                     } else {
                         modalText.textContent = '目前沒有任何資料可備份。您確定要清除所有紀錄嗎？此操作無法復原。';
                     }
-                    
                     showConfirmModal();
+                });
+
+                paginationControls.addEventListener('click', (e) => {
+                    if (e.target.id === 'prev-page-btn' && currentPage > 1) {
+                        currentPage--;
+                        renderOrderLog();
+                    }
+                    if (e.target.id === 'next-page-btn' && currentPage < Math.ceil(allOrders.length / ordersPerPage)) {
+                        currentPage++;
+                        renderOrderLog();
+                    }
                 });
 
                 modalConfirmBtn.addEventListener('click', () => {
@@ -485,8 +518,9 @@
 
             // --- 初始化 ---
             loadDataFromLocalStorage();
-            renderMenuItems();
+            renderMenuItemsAndSubmit();
             updateTotal();
+            renderOrderLog();
             renderCharts();
             renderSalesSummaryTable();
             setupEventListeners(); 
@@ -505,26 +539,21 @@
                     'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2',
                     'https://fonts.gstatic.com/s/notosanstc/v40/TuGOUg-eNqGYqsN7UYEwBx_C-j2f-EzhbqE.woff2'
                 ];
-
                 self.addEventListener('install', event => {
                     event.waitUntil(
                         caches.open(CACHE_NAME)
                             .then(cache => {
                                 console.log('Opened cache');
-                                // 使用 no-cors 模式來快取跨來源資源
                                 const requests = urlsToCache.map(url => new Request(url, { mode: 'no-cors' }));
                                 return cache.addAll(requests);
                             })
                     );
                 });
-
                 self.addEventListener('fetch', event => {
                     event.respondWith(
                         caches.match(event.request)
                             .then(response => {
-                                if (response) {
-                                    return response;
-                                }
+                                if (response) return response;
                                 return fetch(event.request).catch(() => caches.match('/'));
                             })
                     );
@@ -532,15 +561,10 @@
             `;
             const blob = new Blob([swJS], { type: 'application/javascript' });
             const swURL = URL.createObjectURL(blob);
-
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register(swURL)
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('ServiceWorker registration failed: ', error);
-                    });
+                    .then(reg => console.log('ServiceWorker registration successful: ', reg.scope))
+                    .catch(err => console.log('ServiceWorker registration failed: ', err));
             });
         }
     </script>
